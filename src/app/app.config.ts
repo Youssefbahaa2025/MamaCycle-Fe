@@ -16,13 +16,9 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
-// Force development mode for local testing
-const forceDevelopmentMode = true;
-
 // Debug environment configuration
-console.log('[App Config] Current environment:', forceDevelopmentMode ? 'DEVELOPMENT (forced)' : (isDevMode() ? 'DEVELOPMENT' : 'PRODUCTION'));
+console.log('[App Config] Current environment:', isDevMode() ? 'DEVELOPMENT' : 'PRODUCTION');
 console.log('[App Config] API URL from environment:', environment.apiUrl);
-console.log('[App Config] Using localhost API for development');
 
 // 👇 NEW: HttpLoaderFactory for translations
 export function HttpLoaderFactory(http: HttpClient) {
