@@ -84,9 +84,24 @@ export class UserService {
 
   /** Upload a profile picture */
   uploadProfilePicture(userId: number, image: File): Observable<any> {
+    console.log(`Uploading profile picture for user ${userId}`, { fileName: image.name, fileSize: image.size });
+
     const formData = new FormData();
     formData.append('image', image);
-    return this.http.post(`${this.apiUrl}/${userId}/upload`, formData);
+
+    return this.http.post(`${this.apiUrl}/${userId}/upload`, formData).pipe(
+      catchError((error: any) => {
+        console.error('Error uploading profile picture:', error);
+        let errorMessage = 'Failed to upload profile picture';
+
+        // Extract more specific error if available
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        }
+
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 
   /** Get all users */

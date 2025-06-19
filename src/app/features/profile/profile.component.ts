@@ -179,19 +179,59 @@ export class ProfileComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    // Check file size (limit to 5MB)
+    if (this.selectedImage.size > 5 * 1024 * 1024) {
+      alert('Image is too large. Please select an image less than 5MB.');
+      return;
+    }
+
+    // Check file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(this.selectedImage.type)) {
+      alert('Invalid file type. Please select a JPEG, PNG, GIF or WEBP image.');
+      return;
+    }
+
+    console.log('Uploading profile picture:', {
+      userId: this.userId,
+      fileName: this.selectedImage.name,
+      fileType: this.selectedImage.type,
+      fileSize: this.selectedImage.size
+    });
+
+    this.isLoading = true;
     this.userService.uploadProfilePicture(this.userId, this.selectedImage).subscribe({
       next: (res: { path: string }) => {
+        console.log('Profile picture uploaded successfully:', res);
+        this.isLoading = false;
+
         const updatedUser = { ...this.user, image: res.path };
         localStorage.setItem('mamaUser', JSON.stringify(updatedUser));
         this.user = updatedUser;
+
+        // Ensure the image URL is properly formatted
         this.imagePreview = res.path.startsWith('http')
           ? res.path
           : `${this.environment.apiUrl.replace('/api', '')}/${res.path}`;
+
         alert('Profile picture updated!');
+
+        // Reset the selected image
+        this.selectedImage = null;
       },
       error: (err: any) => {
+        this.isLoading = false;
         console.error('Error uploading image:', err);
-        alert('Failed to upload image');
+
+        // Display a user-friendly error message
+        let errorMessage = 'Failed to upload image. Please try again.';
+        if (err.message) {
+          errorMessage = err.message;
+        } else if (err.error && err.error.message) {
+          errorMessage = err.error.message;
+        }
+
+        alert(errorMessage);
       }
     });
   }
