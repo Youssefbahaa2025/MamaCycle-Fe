@@ -5,10 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:mama-cycle": "node dist/mama-cycle/server/server.mjs",
-    "build:vercel": "ng build --configuration=production"
+    "build:vercel": "ng build --configuration=production --prod"
   },
   "private": true,
   "dependencies": {
