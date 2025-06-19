@@ -1,20 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiBaseService } from '../api-base.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = '/api/auth';
+  private apiUrl: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private apiBaseService: ApiBaseService
+  ) {
+    this.apiUrl = this.apiBaseService.getApiUrl('/auth');
+    console.log('Auth Service initialized with API URL:', this.apiUrl);
+  }
 
   login(data: { email: string, password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, data);
   }
 
   signup(data: { name: string, email: string, password: string, role: string }): Observable<any> {
+    console.log('Signing up user with endpoint:', `${this.apiUrl}/signup`);
     return this.http.post(`${this.apiUrl}/signup`, data);
   }
+
 
   logout(): void {
     if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {

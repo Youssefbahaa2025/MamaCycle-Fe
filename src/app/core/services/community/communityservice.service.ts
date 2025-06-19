@@ -3,68 +3,64 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 import { IComment, ICommunityPost } from '../../../models/icommunity-post';
 
 @Injectable({ providedIn: 'root' })
 export class CommunityService {
-  private apiUrl = '/api/community';
-  private commentUrl = '/api/comments';
+  private apiUrl = `${environment.apiUrl}/community`;
+  private commentUrl = `${environment.apiUrl}/comments`;
 
   constructor(private http: HttpClient) { }
 
-  // Community post methods
-  getAll(): Observable<ICommunityPost[]> {
-    return this.http.get<ICommunityPost[]>(this.apiUrl)
-      .pipe(catchError(this.handleError));
-  }
-
-  getById(id: number): Observable<ICommunityPost> {
-    return this.http.get<ICommunityPost>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  createPost(data: FormData): Observable<ICommunityPost> {
-    return this.http.post<ICommunityPost>(this.apiUrl, data)
-      .pipe(catchError(this.handleError));
-  }
-
-  updatePost(id: number, data: FormData): Observable<ICommunityPost> {
-    return this.http.put<ICommunityPost>(`${this.apiUrl}/${id}`, data)
-      .pipe(catchError(this.handleError));
-  }
-
-  deletePost(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  // Comment methods
-  getComments(postId: number): Observable<IComment[]> {
-    return this.http.get<IComment[]>(`${this.commentUrl}/post/${postId}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  addComment(comment: { post_id: number, content: string }): Observable<IComment> {
-    return this.http.post<IComment>(this.commentUrl, comment)
-      .pipe(catchError(this.handleError));
-  }
-
-  deleteComment(id: number): Observable<any> {
-    return this.http.delete(`${this.commentUrl}/${id}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  // Error handling
   private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'An unknown error occurred!';
-    if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMessage = `Error: ${error.error.message}`;
-    } else {
-      // Server-side error
-      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-    }
-    console.error(errorMessage);
-    return throwError(() => new Error(errorMessage));
+    console.error('Community Service Error:', error);
+    return throwError(() => new Error('An error occurred. Please try again later.'));
+  }
+
+  getPosts(): Observable<ICommunityPost[]> {
+    return this.http.get<ICommunityPost[]>(this.apiUrl).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  createPost(formData: FormData): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(this.apiUrl, formData, { headers }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  updatePost(postId: number, formData: FormData): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.put(`${this.apiUrl}/${postId}`, formData, { headers });
+  }
+
+  deletePost(postId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/${postId}`, { headers });
+  }
+
+  getComments(postId: number): Observable<IComment[]> {
+    return this.http.get<IComment[]>(`${this.commentUrl}/${postId}`);
+  }
+
+  addComment(postId: number, message: string): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(this.commentUrl, { post_id: postId, message }, { headers }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  deleteComment(commentId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.commentUrl}/${commentId}`, { headers }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('mamaToken');
+    return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 }

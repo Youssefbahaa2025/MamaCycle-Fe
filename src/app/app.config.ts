@@ -16,14 +16,15 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
-console.log('Current environment:', environment);
-console.log('API URL:', environment.apiUrl);
-console.log('Asset URL:', environment.assetUrl);
-console.log('Production mode:', environment.production);
+// Debug environment configuration
+console.log('[App Config] Current environment:', isDevMode() ? 'DEVELOPMENT' : 'PRODUCTION');
+console.log('[App Config] API URL from environment:', environment.apiUrl);
 
 // 👇 NEW: HttpLoaderFactory for translations
 export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
+  const translationsPath = '/assets/i18n/';
+  console.log(`[App Config] Loading translations from: ${translationsPath}`);
+  return new TranslateHttpLoader(http, translationsPath, '.json');
 }
 
 export const appConfig: ApplicationConfig = {

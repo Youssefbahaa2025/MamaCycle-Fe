@@ -3,20 +3,28 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { IProduct, ProductImage } from '../../../models/Iproduct';
+import { ApiBaseService } from '../api-base.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private apiUrl = '/api/products';
+  private apiUrl: string;
   private refreshTrigger = new BehaviorSubject<void>(undefined);
   refresh$ = this.refreshTrigger.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private apiBaseService: ApiBaseService
+  ) {
+    this.apiUrl = this.apiBaseService.getApiUrl('/products');
+    console.log('Product Service initialized with API URL:', this.apiUrl);
+  }
 
   createProduct(data: FormData) {
     return this.http.post(`${this.apiUrl}`, data);
   }
 
   getAll(): Observable<IProduct[]> {
+    console.log('Getting all products from:', this.apiUrl);
     return this.http.get<IProduct[]>(`${this.apiUrl}`);
   }
 
