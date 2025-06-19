@@ -15,7 +15,17 @@ export class CommunityService {
 
   private handleError(error: HttpErrorResponse) {
     console.error('Community Service Error:', error);
-    return throwError(() => new Error('An error occurred. Please try again later.'));
+
+    let errorMessage = 'An error occurred. Please try again later.';
+
+    // Extract more specific message if available
+    if (error.error && error.error.message) {
+      errorMessage = error.error.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    return throwError(() => new Error(errorMessage));
   }
 
   getPosts(): Observable<ICommunityPost[]> {
@@ -26,14 +36,20 @@ export class CommunityService {
 
   createPost(formData: FormData): Observable<any> {
     const headers = this.getAuthHeaders();
+    console.log('Creating community post with API URL:', this.apiUrl);
+
     return this.http.post(this.apiUrl, formData, { headers }).pipe(
-      catchError(this.handleError)
+      catchError(this.handleError.bind(this))
     );
   }
 
   updatePost(postId: number, formData: FormData): Observable<any> {
     const headers = this.getAuthHeaders();
-    return this.http.put(`${this.apiUrl}/${postId}`, formData, { headers });
+    console.log(`Updating community post ${postId} with API URL: ${this.apiUrl}/${postId}`);
+
+    return this.http.put(`${this.apiUrl}/${postId}`, formData, { headers }).pipe(
+      catchError(this.handleError.bind(this))
+    );
   }
 
   deletePost(postId: number): Observable<any> {

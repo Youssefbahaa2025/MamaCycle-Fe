@@ -244,37 +244,95 @@ export class CommunityComponent implements OnInit {
   }
 
   onImageSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement)?.files?.[0];
-    if (file) {
-      this.newPost.image = file;
-      const reader = new FileReader();
-      reader.onload = () => this.imagePreview = reader.result as string;
-      reader.readAsDataURL(file);
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
     }
+
+    const file = input.files[0];
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image is too large. Please select an image less than 5MB.');
+      // Reset the input
+      input.value = '';
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Invalid file type. Please select a JPEG, PNG, GIF or WEBP image.');
+      // Reset the input
+      input.value = '';
+      return;
+    }
+
+    // File is valid, set the image and create preview
+    this.newPost.image = file;
+    const reader = new FileReader();
+    reader.onload = () => this.imagePreview = reader.result as string;
+    reader.readAsDataURL(file);
+
+    console.log('Selected community post image:', {
+      name: file.name,
+      type: file.type,
+      size: Math.round(file.size / 1024) + 'KB'
+    });
   }
 
   submitPost(): void {
-    const formData = new FormData();
-    formData.append('title', this.newPost.title);
-    formData.append('content', this.newPost.content);
-    formData.append('snippet', this.newPost.content.slice(0, 120));
-    formData.append('author_id', this.currentUser.id.toString());
-    if (this.newPost.image) {
-      formData.append('image', this.newPost.image);
+    // Validate required fields
+    if (!this.newPost.title.trim()) {
+      this.errorMessage = 'Title is required';
+      return;
     }
 
+    if (!this.newPost.content.trim()) {
+      this.errorMessage = 'Content is required';
+      return;
+    }
+
+    // Clear any previous errors
+    this.errorMessage = null;
+
+    // Create form data for submission
+    const formData = new FormData();
+    formData.append('title', this.newPost.title.trim());
+    formData.append('content', this.newPost.content.trim());
+
+    // Create a snippet from the content (first ~100 characters)
+    const snippet = this.newPost.content.trim().slice(0, 100) +
+      (this.newPost.content.length > 100 ? '...' : '');
+    formData.append('snippet', snippet);
+
+    formData.append('author_id', this.currentUser.id.toString());
+
+    // Add image if present
+    if (this.newPost.image) {
+      formData.append('image', this.newPost.image);
+      console.log('Adding image to form data:', this.newPost.image.name);
+    }
+
+    this.isLoading = true; // Show loading indicator
+
+    // Determine if creating new or updating existing
     const action$ = this.isEditing && this.editingPostId != null
       ? this.communityService.updatePost(this.editingPostId, formData)
       : this.communityService.createPost(formData);
 
     action$.subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('Post submitted successfully:', response);
+        this.isLoading = false;
         this.loadPosts();
         this.closeModal();
       },
-      error: err => {
+      error: (err) => {
+        this.isLoading = false;
         console.error('Error submitting post:', err);
         this.errorMessage = err.error?.message
+          || err.message
           || 'Failed to submit post. Please try again.';
       }
     });
