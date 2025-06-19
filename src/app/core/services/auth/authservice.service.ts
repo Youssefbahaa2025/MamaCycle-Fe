@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { ApiBaseService } from '../api-base.service';
 
 @Injectable({ providedIn: 'root' })
@@ -15,8 +15,29 @@ export class AuthService {
     console.log('Auth Service initialized with API URL:', this.apiUrl);
   }
 
+  // Test endpoint to verify API connection
+  testConnection(): Observable<boolean> {
+    return this.http.get<any>(`${this.apiUrl}/test`).pipe(
+      map(response => {
+        console.log('API Connection test successful:', response);
+        return true;
+      }),
+      catchError(error => {
+        console.error('API Connection test failed:', error);
+        return of(false);
+      })
+    );
+  }
+
   login(data: { email: string, password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, data);
+    console.log('Attempting login with endpoint:', `${this.apiUrl}/login`);
+    return this.http.post(`${this.apiUrl}/login`, data).pipe(
+      tap(response => console.log('Login response received:', response)),
+      catchError(error => {
+        console.error('Login request failed:', error);
+        throw error;
+      })
+    );
   }
 
   signup(data: { name: string, email: string, password: string, role: string }): Observable<any> {
