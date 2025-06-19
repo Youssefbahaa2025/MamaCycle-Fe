@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:mama-cycle": "node dist/mama-cycle/server/server.mjs",
-    "build:vercel": "ng build --configuration=production --prod"
+    "build:vercel": "ng build --configuration=production"
   },
   "private": true,
   "dependencies": {
