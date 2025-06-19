@@ -17,7 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   form: FormGroup;
   loginError: string = '';
   isLoading: boolean = false;
@@ -32,29 +32,9 @@ export class LoginComponent implements OnInit {
     console.log('Login component initialized');
   }
 
-  ngOnInit(): void {
-    // Test API connection
-    this.testApiConnection();
-  }
 
-  testApiConnection(): void {
-    console.log('Testing API connection with:', this.authService);
-    this.authService.testConnection().subscribe({
-      next: (connected) => {
-        this.apiConnected = connected;
-        console.log('API connection status:', connected ? 'Connected ✅' : 'Failed ❌');
 
-        if (!connected) {
-          this.loginError = 'Unable to connect to the server. Please try again later.';
-        }
-      },
-      error: (err) => {
-        console.error('API connection test error:', err);
-        this.apiConnected = false;
-        this.loginError = `Server connection error: ${err.status || 'unknown'}. Please try again later.`;
-      }
-    });
-  }
+
 
   login(): void {
     this.loginError = '';

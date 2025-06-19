@@ -15,29 +15,7 @@ export class AuthService {
     console.log('Auth Service initialized with API URL:', this.apiUrl);
   }
 
-  // Test endpoint to verify API connection
-  testConnection(): Observable<boolean> {
-    const testUrl = `${this.apiUrl}/test`;
-    console.log('Testing API connection to:', testUrl);
 
-    return this.http.get<any>(testUrl).pipe(
-      tap(response => console.log('✅ API connection test response:', response)),
-      map(response => {
-        console.log('API Connection test successful:', response);
-        return true;
-      }),
-      catchError(error => {
-        console.error('❌ API Connection test failed:', error);
-        console.error('Error details:', {
-          status: error.status,
-          statusText: error.statusText,
-          url: error.url,
-          message: error.message
-        });
-        return of(false);
-      })
-    );
-  }
 
   login(data: { email: string, password: string }): Observable<any> {
     console.log('Attempting login with endpoint:', `${this.apiUrl}/login`);
