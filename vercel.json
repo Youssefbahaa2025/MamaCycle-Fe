@@ -1,20 +1,13 @@
 {
     "version": 2,
-    "routes": [
+    "rewrites": [
         {
-            "handle": "filesystem"
+            "source": "/api/(.*)",
+            "destination": "https://mamacycle-marketplace-production.up.railway.app/api/$1"
         },
         {
-            "src": "/api/(.*)",
-            "dest": "https://mamacycle-marketplace-production.up.railway.app/api/$1"
-        },
-        {
-            "src": "/(.*\\.(js|css|ico|json|png|jpg|jpeg|svg|webp|gif)$)",
-            "dest": "/$1"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/index.html"
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "headers": [
