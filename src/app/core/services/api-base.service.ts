@@ -1,4 +1,4 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 /**
@@ -13,30 +13,18 @@ export class ApiBaseService {
     private readonly _isProduction: boolean;
 
     constructor() {
-        // Check if we're running in production
-        this._isProduction = window.location.hostname !== 'localhost';
+        // Production is determined in the environment file now
+        this._isProduction = environment.production;
 
         // Log environment configuration for debugging
         console.log('Environment config:', environment);
         console.log('Production mode detected:', this._isProduction);
 
-        // Determine correct API URL based on deployment
-        if (this._isProduction) {
-            // Use the current domain as API base to avoid CORS issues
-            const baseUrl = window.location.origin;
+        // Always use consistent URLs from environment
+        this._apiUrl = environment.apiUrl;
+        this._assetUrl = environment.assetUrl;
 
-            // For Vercel deployment pointing to Railway backend
-            // Make sure we're using https for secure communication in production
-            this._apiUrl = 'https://mamacycle-marketplace-production.up.railway.app/api';
-            this._assetUrl = 'https://mamacycle-marketplace-production.up.railway.app';
-
-            console.log(`Production mode - Using production API URL: ${this._apiUrl}`);
-        } else {
-            // Development mode
-            this._apiUrl = 'http://localhost:3000/api';
-            this._assetUrl = 'http://localhost:3000';
-            console.log(`Development mode - Using local API URL: ${this._apiUrl}`);
-        }
+        console.log(`API Base Service initialized - Using API URL: ${this._apiUrl}`);
     }
 
     /**

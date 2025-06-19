@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
+import { ApiBaseService } from '../api-base.service';
 import { IProduct } from '../../../models/Iproduct';
 
 export interface WishlistNotification {
@@ -21,7 +21,7 @@ export interface WishlistNotification {
   providedIn: 'root'
 })
 export class WishlistService {
-  private apiUrl = `${environment.apiUrl}/wishlist`;
+  private apiUrl: string;
 
   // Observable sources
   private wishlistItemsSubject = new BehaviorSubject<IProduct[]>([]);
@@ -35,7 +35,13 @@ export class WishlistService {
   notifications$ = this.notificationsSubject.asObservable();
   unreadNotificationCount$ = this.unreadNotificationCountSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private apiBaseService: ApiBaseService
+  ) {
+    this.apiUrl = this.apiBaseService.getApiUrl('/wishlist');
+    console.log('Wishlist Service initialized with API URL:', this.apiUrl);
+  }
 
   // Load user's wishlist
   loadWishlist(): Observable<IProduct[]> {

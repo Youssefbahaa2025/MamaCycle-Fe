@@ -1,5 +1,5 @@
 // src/app/app.config.ts
-import { ApplicationConfig, importProvidersFrom, isDevMode } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -16,9 +16,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
-// Debug environment configuration
-console.log('[App Config] Current environment:', isDevMode() ? 'DEVELOPMENT' : 'PRODUCTION');
-console.log('[App Config] API URL from environment:', environment.apiUrl);
+// Log environment for debugging
+const isProduction = environment.production;
+console.log(`[App Config] Current environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+console.log(`[App Config] API URL from environment: ${environment.apiUrl}`);
 
 // 👇 NEW: HttpLoaderFactory for translations
 export function HttpLoaderFactory(http: HttpClient) {

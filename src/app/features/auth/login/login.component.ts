@@ -38,10 +38,11 @@ export class LoginComponent implements OnInit {
   }
 
   testApiConnection(): void {
+    console.log('Testing API connection with:', this.authService);
     this.authService.testConnection().subscribe({
       next: (connected) => {
         this.apiConnected = connected;
-        console.log('API connection status:', connected ? 'Connected' : 'Failed');
+        console.log('API connection status:', connected ? 'Connected ✅' : 'Failed ❌');
 
         if (!connected) {
           this.loginError = 'Unable to connect to the server. Please try again later.';
@@ -50,7 +51,7 @@ export class LoginComponent implements OnInit {
       error: (err) => {
         console.error('API connection test error:', err);
         this.apiConnected = false;
-        this.loginError = 'Server connection error. Please try again later.';
+        this.loginError = `Server connection error: ${err.status || 'unknown'}. Please try again later.`;
       }
     });
   }
