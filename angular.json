@@ -37,7 +37,7 @@
             ],
             "scripts": [],
             "server": "src/main.server.ts",
-            "prerender": true,
+            "prerender": false,
             "ssr": {
               "entry": "src/server.ts"
             }
@@ -56,7 +56,9 @@
                   "maximumError": "200kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "prerender": false,
+              "ssr": false
             },
             "development": {
               "optimization": false,

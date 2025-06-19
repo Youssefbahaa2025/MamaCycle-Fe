@@ -2,6 +2,7 @@ import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,7 @@ export class LanguageService {
 
     constructor(
         private translate: TranslateService,
+        private http: HttpClient,
         @Inject(PLATFORM_ID) platformId: Object
     ) {
         this.isBrowser = isPlatformBrowser(platformId);
@@ -33,21 +35,44 @@ export class LanguageService {
         }
         this.setLanguage(initialLang);
 
+        // Preload translations to ensure they're available
+        this.preloadTranslations();
+
         // Add debug logging
         this.translate.onLangChange.subscribe(event => {
             console.log('Language changed to:', event.lang);
-            console.log('Current translations:', this.translate.instant('rent'));
+            console.log('Current translations available:', this.translate.getLangs());
         });
+    }
+
+    private preloadTranslations() {
+        // Preload both language files to ensure they're available
+        if (this.isBrowser) {
+            this.http.get('/assets/i18n/en.json').subscribe(
+                data => console.log('English translations loaded'),
+                error => console.error('Failed to load English translations:', error)
+            );
+
+            this.http.get('/assets/i18n/ar.json').subscribe(
+                data => console.log('Arabic translations loaded'),
+                error => console.error('Failed to load Arabic translations:', error)
+            );
+        }
     }
 
     setLanguage(lang: string) {
         console.log('Setting language to:', lang);
         this.translate.use(lang).subscribe(
             () => {
-                console.log('Sample translation:', this.translate.instant('rent.title'));
+                console.log('Language set successfully to:', lang);
             },
             error => {
                 console.error('Error loading language:', error);
+                // Fallback to default language
+                if (lang !== 'en') {
+                    console.log('Falling back to English');
+                    this.translate.use('en');
+                }
             }
         );
         this.currentLang.next(lang);
