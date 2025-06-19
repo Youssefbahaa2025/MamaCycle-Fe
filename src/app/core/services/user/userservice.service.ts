@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
 import { ICartItem } from '../../../models/icart-item';
 
 export interface Order {
@@ -28,43 +27,61 @@ export interface User {
   address?: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class UserService {
-  private apiUrl = `${environment.apiUrl}/users`;
+  private apiUrl = '/api/users';
+  private orderApiUrl = '/api/orders';
 
   constructor(private http: HttpClient) { }
 
-  /** Fetch total number of users */
-  getUserCount(): Observable<{ total: number }> {
-    return this.http.get<{ total: number }>(`${this.apiUrl}/count`);
+  getUserProfile(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/profile`);
   }
 
-  /** Admin-only: fetch all orders with items */
-  getAllOrders(): Observable<Order[]> {
-    return this.http
-      .get<{ orders: any[]; message: string }>(`${this.apiUrl}/admin/orders`)
-      .pipe(
-        map(res =>
-          res.orders.map(o => ({
-            id: o.id,
-            user_id: o.user_id,
-            user_name: o.user_name,
-            total_price: +o.total_price,
-            payment_method: o.payment_method,
-            address: o.address,
-            phone: o.phone,
-            status: o.status,
-            created_at: o.created_at,
-            items: o.items.map((i: any): ICartItem => ({
-              id: i.id,
-              name: i.product_name,
-              image: i.image,
-              price: +i.price,
-              quantity: i.quantity
-            }))
-          }))
-        )
-      );
+  updateUserProfile(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/profile`, data);
+  }
+
+  updateProfileImage(image: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('image', image);
+    return this.http.put(`${this.apiUrl}/profile/image`, formData);
+  }
+
+  getUserOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.orderApiUrl}/user`);
+  }
+
+  getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`${this.orderApiUrl}/${id}`);
+  }
+
+  placeOrder(orderData: any): Observable<Order> {
+    return this.http.post<Order>(`${this.orderApiUrl}`, orderData);
+  }
+
+  cancelOrder(id: number): Observable<any> {
+    return this.http.put(`${this.orderApiUrl}/${id}/cancel`, {});
+  }
+
+  // Admin methods
+  getUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
+  }
+
+  getUserCount(): Observable<number> {
+    return this.http.get<{ total: number }>(`${this.apiUrl}/count`)
+      .pipe(map(res => res.total));
+  }
+
+  getAdminOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/admin/orders`);
+  }
+
+  updateOrderStatus(id: number, status: 'pending' | 'completed' | 'canceled'): Observable<Order> {
+    return this.http.put<Order>(`${this.orderApiUrl}/${id}/status`, { status });
   }
 
   /** Fetch a single user profile */

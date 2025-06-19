@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
 import { IProduct } from '../../../models/Iproduct';
 
 export interface WishlistNotification {
@@ -21,124 +20,72 @@ export interface WishlistNotification {
   providedIn: 'root'
 })
 export class WishlistService {
-  private apiUrl = `${environment.apiUrl}/wishlist`;
-  
-  // Observable sources
-  private wishlistItemsSubject = new BehaviorSubject<IProduct[]>([]);
-  private wishlistCountSubject = new BehaviorSubject<number>(0);
-  private notificationsSubject = new BehaviorSubject<WishlistNotification[]>([]);
-  private unreadNotificationCountSubject = new BehaviorSubject<number>(0);
-  
-  // Observable streams
-  wishlistItems$ = this.wishlistItemsSubject.asObservable();
-  wishlistCount$ = this.wishlistCountSubject.asObservable();
-  notifications$ = this.notificationsSubject.asObservable();
-  unreadNotificationCount$ = this.unreadNotificationCountSubject.asObservable();
-  
-  constructor(private http: HttpClient) { }
-  
-  // Load user's wishlist
-  loadWishlist(): Observable<IProduct[]> {
-    return this.http.get<IProduct[]>(`${this.apiUrl}`).pipe(
-      tap(items => {
-        this.wishlistItemsSubject.next(items);
-        this.wishlistCountSubject.next(items.length);
-      }),
-      catchError(error => {
-        console.error('Error loading wishlist', error);
-        return of([]);
-      })
-    );
+  private apiUrl = '/api/wishlist';
+  private wishlistItems = new BehaviorSubject<IProduct[]>([]);
+  public wishlist$ = this.wishlistItems.asObservable();
+  private wishlistCount = new BehaviorSubject<number>(0);
+  public wishlistCount$ = this.wishlistCount.asObservable();
+  private notifications = new BehaviorSubject<WishlistNotification[]>([]);
+  public notifications$ = this.notifications.asObservable();
+
+  constructor(private http: HttpClient) {
+    this.loadWishlist();
   }
-  
-  // Add product to wishlist
-  addToWishlist(productId: number): Observable<{message: string, count: number}> {
-    return this.http.post<{message: string, count: number}>(`${this.apiUrl}`, { productId }).pipe(
-      tap(response => {
-        this.wishlistCountSubject.next(response.count);
-        // Reload wishlist to get updated items
-        this.loadWishlist().subscribe();
-      }),
-      catchError(error => {
-        console.error('Error adding to wishlist', error);
-        return of({ message: 'Error adding to wishlist', count: this.wishlistCountSubject.value });
-      })
-    );
+
+  private loadWishlist() {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('mamaToken')) {
+      this.getWishlist().subscribe({
+        next: (items) => {
+          this.wishlistItems.next(items);
+          this.wishlistCount.next(items.length);
+        },
+        error: (err) => console.error('Error loading wishlist:', err)
+      });
+    }
   }
-  
-  // Remove product from wishlist
-  removeFromWishlist(productId: number): Observable<{message: string, count: number}> {
-    return this.http.delete<{message: string, count: number}>(`${this.apiUrl}/${productId}`).pipe(
-      tap(response => {
-        this.wishlistCountSubject.next(response.count);
-        // Update local wishlist items
-        const currentItems = this.wishlistItemsSubject.value;
-        this.wishlistItemsSubject.next(currentItems.filter(item => item.id !== productId));
-      }),
-      catchError(error => {
-        console.error('Error removing from wishlist', error);
-        return of({ message: 'Error removing from wishlist', count: this.wishlistCountSubject.value });
-      })
-    );
+
+  getWishlist(): Observable<IProduct[]> {
+    return this.http.get<IProduct[]>(this.apiUrl);
   }
-  
-  // Check if product is in wishlist
-  isInWishlist(productId: number): Observable<{isInWishlist: boolean}> {
-    return this.http.get<{isInWishlist: boolean}>(`${this.apiUrl}/check/${productId}`).pipe(
-      catchError(error => {
-        console.error('Error checking wishlist', error);
-        return of({ isInWishlist: false });
-      })
-    );
+
+  addToWishlist(productId: number): Observable<any> {
+    return this.http.post(this.apiUrl, { product_id: productId })
+      .pipe(
+        tap(() => this.loadWishlist()),
+        catchError(error => {
+          console.error('Error adding to wishlist:', error);
+          return of({ error: true, message: error.message });
+        })
+      );
   }
-  
-  // Get wishlist notifications
+
+  removeFromWishlist(productId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${productId}`)
+      .pipe(
+        tap(() => this.loadWishlist()),
+        catchError(error => {
+          console.error('Error removing from wishlist:', error);
+          return of({ error: true, message: error.message });
+        })
+      );
+  }
+
+  isInWishlist(productId: number): boolean {
+    return this.wishlistItems.value.some(item => item.id === productId);
+  }
+
   getNotifications(): Observable<WishlistNotification[]> {
-    return this.http.get<WishlistNotification[]>(`${this.apiUrl}/notifications`).pipe(
-      tap(notifications => {
-        this.notificationsSubject.next(notifications);
-        const unreadCount = notifications.filter(n => !n.is_read).length;
-        this.unreadNotificationCountSubject.next(unreadCount);
-      }),
-      catchError(error => {
-        console.error('Error getting notifications', error);
-        return of([]);
-      })
-    );
+    return this.http.get<WishlistNotification[]>(`${this.apiUrl}/notifications`)
+      .pipe(
+        tap(notifications => this.notifications.next(notifications)),
+        catchError(error => {
+          console.error('Error getting notifications:', error);
+          return of([]);
+        })
+      );
   }
-  
-  // Mark notification as read
-  markNotificationAsRead(notificationId: number): Observable<{message: string}> {
-    return this.http.put<{message: string}>(`${this.apiUrl}/notifications/${notificationId}/read`, {}).pipe(
-      tap(() => {
-        // Update local notifications
-        const currentNotifications = this.notificationsSubject.value;
-        const updatedNotifications = currentNotifications.map(n => 
-          n.notification_id === notificationId ? {...n, is_read: true} : n
-        );
-        this.notificationsSubject.next(updatedNotifications);
-        
-        // Update unread count
-        const unreadCount = updatedNotifications.filter(n => !n.is_read).length;
-        this.unreadNotificationCountSubject.next(unreadCount);
-      }),
-      catchError(error => {
-        console.error('Error marking notification as read', error);
-        return of({ message: 'Error marking notification as read' });
-      })
-    );
-  }
-  
-  // Get unread notification count
-  getUnreadNotificationCount(): Observable<{count: number}> {
-    return this.http.get<{count: number}>(`${this.apiUrl}/notifications/count`).pipe(
-      tap(response => {
-        this.unreadNotificationCountSubject.next(response.count);
-      }),
-      catchError(error => {
-        console.error('Error getting notification count', error);
-        return of({ count: 0 });
-      })
-    );
+
+  markNotificationAsRead(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/notifications/${id}/read`, {});
   }
 }

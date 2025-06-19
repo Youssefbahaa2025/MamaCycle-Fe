@@ -1,13 +1,12 @@
 // src/app/core/services/product/product.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { IProduct, ProductImage } from '../../../models/Iproduct';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private apiUrl = `${environment.apiUrl}/products`;
+  private apiUrl = '/api/products';
   private refreshTrigger = new BehaviorSubject<void>(undefined);
   refresh$ = this.refreshTrigger.asObservable();
 

@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
 import { ICategory } from '../../../models/category';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
-  private apiUrl = `${environment.apiUrl}/categories`;
+  private apiUrl = '/api/categories';
   private _categories$ = new BehaviorSubject<ICategory[]>([]);
   public categories$ = this._categories$.asObservable();
 

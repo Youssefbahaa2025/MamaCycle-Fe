@@ -1,13 +1,12 @@
 // src/app/core/services/cart/cartservice.service.ts
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { BehaviorSubject, Observable, tap, map } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  private apiUrl = `${environment.apiUrl}/cart`;
+  private apiUrl = '/api/cart';
   private cartCountSubject = new BehaviorSubject<number>(0);
   public cartCount$ = this.cartCountSubject.asObservable();
   private isBrowser: boolean;
@@ -21,44 +20,51 @@ export class CartService {
   }
 
   private initializeCartCount(): void {
-    if (this.isBrowser && typeof localStorage !== 'undefined') {
-      try {
-        const user = localStorage.getItem('mamaUser');
-        if (user) {
-          const userData = JSON.parse(user);
-          const userId = userData?.id;
-          if (userId) this.refreshCartCount(userId);
-        }
-      } catch (e) {
-        console.error('Error initializing cart count:', e);
-      }
+    if (this.isBrowser && localStorage.getItem('mamaToken')) {
+      this.getCartCount().subscribe({
+        next: (count) => this.cartCountSubject.next(count),
+        error: (err) => console.error('Error fetching cart count:', err)
+      });
     }
   }
 
-  getCart(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${userId}`);
+  getCartItems(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
   }
 
-  addToCart(data: { userId: number, productId: number, quantity: number }): Observable<any> {
-    return this.http.post(this.apiUrl, data).pipe(
-      tap(() => this.refreshCartCount(data.userId))
-    );
+  addToCart(data: { product_id: number, quantity: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, data)
+      .pipe(tap(() => this.updateCartCount()));
   }
 
-  updateQuantity(id: number, quantity: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, { quantity });
+  updateCartItem(id: number, data: { quantity: number }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, data)
+      .pipe(tap(() => this.updateCartCount()));
   }
 
-  removeFromCart(id: number, userId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
-      tap(() => this.refreshCartCount(userId))
-    );
+  removeFromCart(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`)
+      .pipe(tap(() => this.updateCartCount()));
   }
 
-  refreshCartCount(userId: number): void {
-    this.getCart(userId).subscribe(items => {
-      const total = items.reduce((sum, item) => sum + item.quantity, 0);
-      this.cartCountSubject.next(total);
-    });
+  clearCart(): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/clear`)
+      .pipe(tap(() => this.cartCountSubject.next(0)));
+  }
+
+  private getCartCount(): Observable<number> {
+    return this.http.get<{ count: number }>(`${this.apiUrl}/count`)
+      .pipe(
+        tap(response => console.log('Cart count response:', response)),
+        map(response => response.count),
+        tap(count => this.cartCountSubject.next(count)),
+        tap(() => console.log('Updated cart count:', this.cartCountSubject.value))
+      );
+  }
+
+  private updateCartCount(): void {
+    if (this.isBrowser && localStorage.getItem('mamaToken')) {
+      this.getCartCount().subscribe();
+    }
   }
 }
