@@ -1,0 +1,209 @@
+:host {
+  display: block;
+}
+
+/* Signup hero section styling */
+.signup-hero-section {
+  position: relative;
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Floating animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-animation-slow {
+  animation: float 8s ease-in-out infinite;
+}
+
+/* Card animation and styling */
+.signup-card {
+  transition: all 0.3s ease;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.signup-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Form field styles */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  outline: none;
+  border: 1px solid rgba(203, 213, 225);
+}
+
+.form-control:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Form group hover effect */
+.form-group:hover label {
+  color: #6366f1;
+}
+
+.dark .form-control {
+  background-color: #374151;
+  border-color: #4B5563;
+  color: white;
+}
+
+.dark .form-control:focus {
+  border-color: #6366F1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+/* Button styles */
+.btn-primary {
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-image: linear-gradient(to right, #4f46e5, #4338ca);
+  padding: 0.75rem 2rem;
+  color: white;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  background-image: linear-gradient(to right, #4338ca, #3730a3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 100%);
+  transform: skewX(-25deg);
+  transition: all 0.75s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-hover-float {
+  transition: transform 0.3s ease;
+}
+
+.btn-hover-float:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Text gradient effect */
+.text-gradient {
+  background-size: 200% auto;
+  background-image: linear-gradient(to right, #6366f1 0%, #a855f7 50%, #6366f1 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.5s ease;
+}
+
+.text-gradient:hover {
+  background-position: right center;
+}
+
+/* Wavy line decoration */
+.wavy-line {
+  position: relative;
+  overflow: hidden;
+  height: 32px;
+}
+
+.wavy-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10c30-10 70 10 100 0v10H0V10z' fill='%236366f1' fill-opacity='.5'/%3E%3C/svg%3E");
+  background-size: 100px 20px;
+  animation: wave 7s linear infinite;
+}
+
+@keyframes wave {
+  0% { background-position: 0px; }
+  100% { background-position: 1000px; }
+}
+
+.dark-mode-transition {
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+
+/* Benefits card styling */
+.benefit-card {
+  transition: all 0.3s ease;
+  border-radius: 1rem;
+  overflow: hidden;
+  height: 100%;
+}
+
+.benefit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-icon {
+  transition: all 0.3s ease;
+}
+
+.benefit-card:hover .benefit-icon {
+  transform: scale(1.1);
+}

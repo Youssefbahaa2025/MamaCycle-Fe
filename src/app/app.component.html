@@ -1,0 +1,26 @@
+<!-- Professional Gradient Overlay Spinner -->
+<ngx-spinner
+  bdColor="rgba(17, 24, 39, 0.85)"
+  size="large"
+  color="transparent"
+  type="ball-scale-multiple"
+  [fullScreen]="true"
+>
+  <div class="flex flex-col items-center justify-center space-y-4">
+    <!-- Gradient Pulsing Ring -->
+    <div class="relative w-16 h-16">
+      <div
+        class="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-600 to-pink-500 animate-ping opacity-60"
+      ></div>
+      <div
+        class="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-300 animate-spin"
+      ></div>
+    </div>
+    <!-- Loading Text -->
+    <p class="text-white text-lg font-semibold uppercase animate-pulse">
+      Loading...
+    </p>
+  </div>
+</ngx-spinner>
+
+<router-outlet></router-outlet>

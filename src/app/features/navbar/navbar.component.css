@@ -1,0 +1,272 @@
+/* src/app/shared/navbar/navbar.component.css */
+@import 'aos/dist/aos.css';
+
+:host {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+/* Navigation link styling */
+a {
+  transition: all 0.3s ease;
+  position: relative;
+  text-decoration: none;
+}
+  
+a:hover {
+  color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  transition: width 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  border-radius: 2px;
+}
+
+a:hover::after {
+  width: 70%;
+  opacity: 1;
+}
+
+.active-link::after {
+  width: 70%;
+  opacity: 1;
+}
+
+/* Logo styling */
+.logo-container {
+  position: relative;
+  overflow: visible;
+  transition: transform 0.3s ease;
+}
+
+.logo-container:hover {
+  transform: translateY(-2px);
+}
+
+.logo-text {
+  transition: all 0.5s ease;
+  letter-spacing: -0.5px;
+  background-size: 200% auto;
+  background-image: linear-gradient(90deg, #4f46e5, #8b5cf6, #4f46e5);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient 3s linear infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.logo-text:hover {
+  letter-spacing: 0px;
+}
+
+/* Navbar transitions */
+.navbar {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.dark .navbar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.navbar-scrolled {
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .navbar-scrolled {
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Navbar visibility transitions */
+.translate-y-0 {
+  transform: translateY(0);
+}
+
+.-translate-y-full {
+  transform: translateY(-100%);
+}
+
+/* Button styling */
+.nav-button {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  border-width: 1px;
+  font-weight: 500;
+}
+
+.nav-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(79, 70, 229, 0.1);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+.nav-button:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.nav-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Utility icons styling */
+.utility-icon {
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.utility-icon:hover {
+  background-color: rgba(79, 70, 229, 0.1);
+  transform: translateY(-1px);
+}
+
+.dark .utility-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Badge styling */
+.cart-badge, .wishlist-badge, .notification-badge {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cart-badge:hover, .wishlist-badge:hover, .notification-badge:hover {
+  transform: scale(1.1);
+}
+
+/* Slide‑in from the right */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0);    }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.25s ease-out both;
+}
+
+/* Cart badge animation */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.cart-badge {
+  animation: pulse 2s infinite;
+}
+
+/* Mobile menu link effects */
+.mobile-link {
+  position: relative;
+  transition: all 0.3s ease;
+  transform: translateX(0);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.mobile-link:hover {
+  transform: translateX(5px);
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.dark .mobile-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark mode toggle animation */
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.dark-mode-toggle:hover svg {
+  animation: spin 0.7s ease-in-out;
+}
+
+/* Dark mode specific styles */
+.dark .nav-button::before {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark a::after {
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+}
+
+/* Language toggle styling */
+.language-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.language-toggle:hover {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.dark .language-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 1.5rem;
+  }
+  
+  .mobile-link {
+    margin: 0.25rem 0;
+  }
+  
+  .utility-icon {
+    padding: 0.75rem;
+  }
+}
+
+/* Focus styles for accessibility */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+.dark a:focus-visible,
+.dark button:focus-visible {
+  outline-color: #6366f1;
+}

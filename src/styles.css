@@ -1,0 +1,81 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 
+           dark:bg-primary-500 dark:hover:bg-primary-600 transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 
+           dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 
+           hover:shadow-xl transition-shadow duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 rounded-lg border border-gray-300 
+           dark:border-gray-600 dark:bg-gray-700 dark:text-white
+           focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+
+  .nav-link {
+    @apply text-gray-700 dark:text-gray-200 hover:text-primary-600 
+           dark:hover:text-primary-400 transition-colors duration-200;
+  }
+
+  .section-header {
+    @apply text-3xl font-bold mb-8 text-gray-800 dark:text-white;
+  }
+
+  .content-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300;
+  }
+
+  .image-container {
+    @apply w-full h-64 object-cover rounded-lg mb-4;
+  }
+
+  .info-container {
+    @apply p-4 space-y-2;
+  }
+
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50;
+  }
+
+  .modal-container {
+    @apply fixed inset-0 flex items-center justify-center p-4;
+  }
+
+  .modal-content {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-lg w-full p-6;
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}

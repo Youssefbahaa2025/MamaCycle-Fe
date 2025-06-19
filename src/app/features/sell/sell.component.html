@@ -1,0 +1,246 @@
+<!-- src/app/features/sell/sell.component.html -->
+<section class="sell-hero-section relative py-16 bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-gray-900 overflow-hidden dark-mode-transition">
+  <!-- Decorative Elements -->
+  <div class="absolute top-1/4 left-10 w-24 h-24 bg-indigo-600/10 rounded-full blur-3xl float-animation-slow"></div>
+  <div class="absolute bottom-1/3 right-10 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl float-animation"></div>
+
+  <div class="container max-w-5xl mx-auto px-6">
+    <div class="text-center mb-10">
+      <span class="px-4 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 inline-block mb-4" translate>sell.title</span>
+      <h1 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">{{ 'sell.heroTitle' | translate }} <span class="text-indigo-600 text-gradient">{{ 'sell.heroHighlight' | translate }}</span></h1>
+      <div class="wavy-line my-4"></div>
+      <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" translate>sell.heroDescription</p>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 px-6 dark:bg-gray-900 dark-mode-transition">
+  <div class="max-w-3xl mx-auto">
+    <form [formGroup]="form"
+          (ngSubmit)="submit()"
+          class="space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+
+      <!-- Product Name -->
+      <div class="form-group">
+        <label class="block mb-2 text-gray-700 dark:text-gray-200 font-medium" translate>sell.itemTitle</label>
+        <input type="text" formControlName="name"
+              class="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+              [placeholder]="'sell.itemTitlePlaceholder' | translate">
+        <p *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
+          class="text-red-500 text-sm mt-2 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          {{ 'sell.requiredField' | translate }}
+        </p>
+      </div>
+
+      <!-- Price -->
+      <div class="form-group">
+        <label class="block mb-2 text-gray-700 dark:text-gray-200 font-medium" translate>sell.price</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">{{ 'shop.currency' | translate }}</span>
+          </div>
+          <input type="text" formControlName="price"
+                class="w-full p-3 pl-12 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                [placeholder]="'sell.pricePlaceholder' | translate">
+        </div>
+        <p *ngIf="form.get('price')?.invalid && form.get('price')?.touched"
+          class="text-red-500 text-sm mt-2 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          {{ 'sell.requiredField' | translate }}
+        </p>
+      </div>
+
+      <!-- Two Columns Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Type -->
+        <div class="form-group">
+          <label class="block mb-2 text-gray-700 dark:text-gray-200 font-medium" translate>sell.type</label>
+          <div class="relative">
+            <select formControlName="type"
+                  class="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 appearance-none">
+              <option value="sale">{{ 'shop.forSale' | translate }}</option>
+              <option value="rent">{{ 'shop.forRent' | translate }}</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="block mb-2 text-gray-700 dark:text-gray-200 font-medium" translate>sell.category</label>
+          <div class="relative">
+            <select formControlName="category_id"
+                  class="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 appearance-none">
+              <option value="" disabled>{{ 'sell.selectCategory' | translate }}</option>
+              <option *ngFor="let c of availableCategories" [value]="c.category_id">
+                {{ c.category_name }}
+              </option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+          <p *ngIf="form.get('category_id')?.invalid && form.get('category_id')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            {{ 'sell.requiredField' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Condition - Only for Rent Products -->
+      <div class="form-group" *ngIf="form.get('type')?.value === 'rent'">
+        <label class="block mb-2 text-gray-700 dark:text-gray-200 font-medium" translate>sell.condition</label>
+        <div class="relative">
+          <select formControlName="condition"
+                class="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 appearance-none">
+            <option value="Like New">{{ 'sell.conditions.likeNew' | translate }}</option>
+            <option value="Good">{{ 'sell.conditions.good' | translate }}</option>
+            <option value="Used">{{ 'sell.conditions.used' | translate }}</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
+        <p *ngIf="form.get('condition')?.invalid && form.get('condition')?.touched"
+          class="text-red-500 text-sm mt-2 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          {{ 'sell.requiredField' | translate }}
+        </p>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="block mb-2 text-gray-700 dark:text-gray-200 font-medium" translate>sell.description</label>
+        <textarea formControlName="description" rows="4"
+                class="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                [placeholder]="'sell.descriptionPlaceholder' | translate"></textarea>
+        <p *ngIf="form.get('description')?.invalid && form.get('description')?.touched"
+          class="text-red-500 text-sm mt-2 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          {{ 'sell.requiredField' | translate }}
+        </p>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label class="block mb-2 text-gray-700 dark:text-gray-200 font-medium" translate>sell.images</label>
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors duration-200"
+            (click)="triggerFileInput()">
+          <input type="file"
+                id="fileInput"
+                (change)="onFileChange($event)"
+                accept="image/*"
+                class="hidden"
+                multiple>
+
+          <div *ngIf="previewImages.length === 0">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400" translate>sell.uploadPrompt</p>
+            <p class="text-xs text-gray-500 dark:text-gray-500" translate>sell.uploadRestrictions</p>
+          </div>
+
+          <div *ngIf="previewImages.length > 0">
+            <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+              {{previewImages.length}} {{ 'sell.of' | translate }} {{maxImages}} {{ 'sell.imagesSelected' | translate }}
+              <span *ngIf="previewImages.length < maxImages">{{ 'sell.clickToAddMore' | translate }}</span>
+            </p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+              <div *ngFor="let img of previewImages; let i = index" class="relative">
+                <img [src]="img.preview" alt="Preview" class="product-preview shine-effect h-36 w-full object-cover rounded">
+                <button type="button"
+                        (click)="removeImage(i); $event.stopPropagation()"
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p *ngIf="form.get('image')?.invalid && form.get('image')?.touched"
+          class="text-red-500 text-sm mt-2 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          {{ 'sell.imageRequired' | translate }}
+        </p>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-4 text-center">
+        <button type="submit"
+                [disabled]="form.invalid"
+                class="btn-hover-float bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-8 py-4 rounded-xl text-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-500 flex items-center mx-auto"
+                translate>sell.submit</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Selling Tips Section -->
+<section class="py-16 px-6 bg-gradient-to-b from-white to-indigo-50 dark:from-gray-900 dark:to-indigo-900/20 dark-mode-transition">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <span class="px-4 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 inline-block mb-4" translate>sell.tips</span>
+      <h2 class="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ 'sell.howToSell' | translate }} <span class="text-indigo-600 text-gradient">{{ 'sell.successfully' | translate }}</span></h2>
+      <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" translate>sell.tipsDescription</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
+        <div class="text-indigo-600 mb-4">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2" translate>sell.tips.qualityPhotos.title</h3>
+        <p class="text-gray-600 dark:text-gray-300" translate>sell.tips.qualityPhotos.description</p>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
+        <div class="text-indigo-600 mb-4">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2" translate>sell.tips.detailedDescription.title</h3>
+        <p class="text-gray-600 dark:text-gray-300" translate>sell.tips.detailedDescription.description</p>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
+        <div class="text-indigo-600 mb-4">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2" translate>sell.tips.fairPricing.title</h3>
+        <p class="text-gray-600 dark:text-gray-300" translate>sell.tips.fairPricing.description</p>
+      </div>
+    </div>
+  </div>
+</section>

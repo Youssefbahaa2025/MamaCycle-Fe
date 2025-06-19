@@ -1,0 +1,11 @@
+<!-- src/app/shared/components/alert/alert.component.html -->
+<div *ngIf="message$ | async as message" class="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+    <div [ngClass]="{
+          'bg-green-500': message.type === 'success',
+          'bg-red-500': message.type === 'error'
+        }"
+        class="text-white px-6 py-3 rounded shadow">
+      {{ message.text }}
+    </div>
+  </div>
+  

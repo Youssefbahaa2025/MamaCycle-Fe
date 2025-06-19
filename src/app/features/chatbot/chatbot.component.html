@@ -1,0 +1,42 @@
+<!-- Floating Chat Button -->
+<div class="fixed bottom-6 right-6 z-50">
+  <button
+    (click)="toggleChat()"
+    class="bg-indigo-600 hover:bg-indigo-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition">
+    💬
+  </button>
+</div>
+
+<!-- Chat Window -->
+<div *ngIf="isOpen"
+     class="fixed bottom-24 right-6 z-50 w-80 md:w-96 rounded-2xl border border-indigo-200 dark:border-gray-700 shadow-xl overflow-hidden">
+
+  <!-- Header -->
+  <div class="bg-indigo-600 text-white px-4 py-3 font-semibold text-lg">
+    MamaCycle Assistant
+  </div>
+
+  <!-- Quick‑ask suggestions -->
+  <div class="p-2 flex flex-wrap gap-2 bg-gray-50 dark:bg-gray-800">
+    <button *ngFor="let q of suggestions"
+            (click)="askSuggestion(q)"
+            class="px-3 py-1 rounded-full bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-xs">
+      {{ q }}
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div class="bg-white dark:bg-gray-900 max-h-96 overflow-y-auto p-4 space-y-3 text-sm">
+    <div *ngFor="let msg of messages"
+         [ngClass]="msg.sender === 'user' ? 'justify-end flex' : 'justify-start flex'">
+      <span [ngClass]="{
+              'bg-indigo-600 text-white': msg.sender==='user',
+              'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white': msg.sender==='bot'
+            }"
+            class="inline-block px-4 py-2 rounded-xl max-w-[80%] whitespace-pre-line">
+        {{ msg.text }}
+      </span>
+    </div>
+  </div>
+
+</div>

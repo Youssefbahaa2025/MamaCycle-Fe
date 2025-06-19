@@ -1,0 +1,189 @@
+<!-- Wishlist Hero Section -->
+<section class="wishlist-hero-section relative py-16 bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-gray-900 overflow-hidden dark-mode-transition">
+  <!-- Decorative Elements -->
+  <div class="absolute top-1/4 left-10 w-24 h-24 bg-indigo-600/10 rounded-full blur-3xl float-animation-slow"></div>
+  <div class="absolute bottom-1/3 right-10 w-32 h-32 bg-purple-600/10 rounded-full blur-3xl float-animation"></div>
+
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-10" data-aos="fade-up">
+      <span class="px-4 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 inline-block mb-4">My Wishlist</span>
+      <h1 class="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Your <span class="text-indigo-600 text-gradient">Saved Items</span></h1>
+      <div class="wavy-line my-4"></div>
+      <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+        Keep track of your favorite baby products and get notified when they go on sale or come back in stock.
+      </p>
+
+      <!-- Share Wishlist Button -->
+      <button
+        (click)="shareWishlist()"
+        class="mt-6 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+        Share Wishlist
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Wishlist Content Section -->
+<section class="py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
+  <div class="container mx-auto px-6">
+    <!-- Notifications Button -->
+    <div class="flex justify-end mb-6">
+      <button
+        (click)="toggleNotifications()"
+        class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-200 dark:hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        Notifications
+        <span *ngIf="unreadNotificationCount > 0" class="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs rounded-full">
+          {{ unreadNotificationCount }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div *ngIf="showNotifications" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-8 transition-all duration-300" data-aos="fade-down">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notifications</h3>
+
+      <div *ngIf="notifications.length === 0" class="text-center py-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <p class="text-gray-600 dark:text-gray-400">No notifications yet</p>
+      </div>
+
+      <div *ngIf="notifications.length > 0" class="space-y-4">
+        <div *ngFor="let notification of notifications"
+             class="flex items-start p-3 rounded-lg transition-colors duration-200"
+             [ngClass]="notification.is_read ? 'bg-gray-50 dark:bg-gray-700' : 'bg-indigo-50 dark:bg-indigo-900/20'"
+        >
+          <!-- Notification Icon -->
+          <div class="flex-shrink-0 mr-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+              <svg *ngIf="notification.type === 'price_drop'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
+              <svg *ngIf="notification.type === 'back_in_stock'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Notification Content -->
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-medium text-gray-900 dark:text-white">
+                {{ notification.type === 'price_drop' ? 'Price Drop' : 'Back in Stock' }}
+              </p>
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                {{ notification.created_at | date:'short' }}
+              </span>
+            </div>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+              {{ notification.product_name }} is {{ notification.type === 'price_drop' ? 'now on sale' : 'back in stock' }}!
+            </p>
+            <div class="mt-2">
+              <a [routerLink]="['/product', notification.product_id]" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                View Product
+              </a>
+            </div>
+          </div>
+
+          <!-- Product Image -->
+          <div class="ml-3 flex-shrink-0">
+            <img [src]="notification.image" [alt]="notification.product_name" class="w-12 h-12 object-cover rounded-md">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="wishlistItems.length === 0 && !isLoading" class="empty-state" data-aos="fade-up">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+      </svg>
+      <h3 class="dark:text-white">Your Wishlist is Empty</h3>
+      <p class="dark:text-gray-300">Save items you love by clicking the heart icon on product pages.</p>
+      <a routerLink="/shop" class="mt-6 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Browse Products
+      </a>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+    </div>
+
+    <!-- Wishlist Grid -->
+    <div *ngIf="wishlistItems.length > 0 && !isLoading" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div *ngFor="let item of wishlistItems; let i = index"
+           class="product-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
+           (click)="goToProductDetails(item.id)"
+           [attr.data-aos]="'fade-up'"
+           [attr.data-aos-delay]="100 + (i % 4) * 50">
+        <div class="relative overflow-hidden"
+             (mouseenter)="nextProductImage(item, $event)"
+             (mouseleave)="resetProductImage(item, $event)">
+          <img
+            [src]="getCurrentImage(item) || (
+              item.image.startsWith('http')
+                ? item.image
+                : (environment.apiUrl.replace('/api','') + '/' + item.image)
+            )"
+            [alt]="item.name"
+            class="product-image transition-transform duration-500"
+          />
+          <!-- Multi-image indicator -->
+          <div *ngIf="item.has_multiple_images || (item.images && item.images.length > 1)"
+               class="absolute bottom-2 right-2 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600 dark:text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <!-- Image counter badge -->
+          <div *ngIf="item.images && item.images.length > 1"
+               class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+            {{ productImageIndex[item.id] + 1 }}/{{ item.images.length }}
+          </div>
+
+          <!-- Remove from wishlist button -->
+          <button
+            (click)="removeFromWishlist(item.id, $event)"
+            class="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title text-gray-800 dark:text-white">{{ item.name }}</h3>
+
+          <div class="product-meta">
+            <p class="product-price dark:text-indigo-300">{{ item.price }} EGP</p>
+            <span class="product-badge" [ngClass]="item.type">
+              {{ item.type === 'sale' ? 'For Sale' : 'For Rent' }}
+            </span>
+          </div>
+
+          <p class="product-category dark:text-gray-400">
+            Category: {{ item.category_name }}
+          </p>
+
+          <button (click)="addToCart(item.id, $event)"
+                  class="add-to-cart-btn bg-indigo-600 text-white py-3 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600">
+            <span>Add to Cart</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
