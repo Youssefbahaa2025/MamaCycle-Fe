@@ -1,6 +1,6 @@
 // src/app/app.config.ts
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideToastr } from 'ngx-toastr';
@@ -54,8 +54,8 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([authInterceptor, loadingInterceptor, messageInterceptor])
     ),
 
-    // 3️⃣ router & toastr
-    provideRouter(routes),
+    // 3️⃣ router & toastr with hash location strategy for better compatibility with hosting
+    provideRouter(routes, withHashLocation()),
     provideToastr()
   ]
 };
