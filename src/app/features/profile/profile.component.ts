@@ -165,12 +165,34 @@ export class ProfileComponent implements OnInit, AfterViewInit {
 
   onImageChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.selectedImage = input.files[0];
-      const reader = new FileReader();
-      reader.onload = e => this.imagePreview = e.target?.result || null;
-      reader.readAsDataURL(this.selectedImage);
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+
+    // Check file size (limit to 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image is too large. Please select an image less than 5MB.');
+      input.value = '';
+      return;
     }
+
+    // Check file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      alert('Invalid file type. Please select a JPEG, PNG, GIF or WEBP image.');
+      input.value = '';
+      return;
+    }
+
+    console.log(`Selected profile image: ${file.name}, size: ${Math.round(file.size / 1024)}KB, type: ${file.type}`);
+    this.selectedImage = file;
+
+    const reader = new FileReader();
+    reader.onload = e => this.imagePreview = e.target?.result || null;
+    reader.readAsDataURL(file);
+
+    // Clear the input value to allow selecting the same file again if needed
+    input.value = '';
   }
 
   uploadProfilePicture(): void {
@@ -179,24 +201,11 @@ export class ProfileComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Check file size (limit to 5MB)
-    if (this.selectedImage.size > 5 * 1024 * 1024) {
-      alert('Image is too large. Please select an image less than 5MB.');
-      return;
-    }
-
-    // Check file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validTypes.includes(this.selectedImage.type)) {
-      alert('Invalid file type. Please select a JPEG, PNG, GIF or WEBP image.');
-      return;
-    }
-
     console.log('Uploading profile picture:', {
       userId: this.userId,
       fileName: this.selectedImage.name,
       fileType: this.selectedImage.type,
-      fileSize: this.selectedImage.size
+      fileSize: Math.round(this.selectedImage.size / 1024) + 'KB'
     });
 
     this.isLoading = true;
@@ -209,10 +218,8 @@ export class ProfileComponent implements OnInit, AfterViewInit {
         localStorage.setItem('mamaUser', JSON.stringify(updatedUser));
         this.user = updatedUser;
 
-        // Ensure the image URL is properly formatted
-        this.imagePreview = res.path.startsWith('http')
-          ? res.path
-          : `${this.environment.apiUrl.replace('/api', '')}/${res.path}`;
+        // Ensure the image URL is properly formatted - but for Cloudinary we can use the URL as-is
+        this.imagePreview = res.path;
 
         alert('Profile picture updated!');
 

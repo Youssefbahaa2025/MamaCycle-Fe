@@ -137,7 +137,28 @@ export class SellComponent implements OnInit {
     }
 
     // Process each file
-    Array.from(input.files).forEach(file => {
+    const filesToProcess = Array.from(input.files);
+    for (const file of filesToProcess) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.notify.show(`File ${file.name} exceeds the maximum file size of 5MB`, 'error');
+        continue;
+      }
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        this.notify.show(`File ${file.name} has an invalid file type. Please upload JPEG, PNG, GIF, or WEBP images.`, 'error');
+        continue;
+      }
+
+      // Check for duplicate files by name
+      const isDuplicate = this.selectedFiles.some(f => f.name === file.name && f.size === file.size);
+      if (isDuplicate) {
+        console.log(`Skipping duplicate file: ${file.name}`);
+        continue;
+      }
+
       // Add to selected files
       this.selectedFiles.push(file);
 
@@ -150,7 +171,10 @@ export class SellComponent implements OnInit {
         });
       };
       reader.readAsDataURL(file);
-    });
+
+      // Log the file being added
+      console.log(`Adding file to upload: ${file.name}, size: ${Math.round(file.size / 1024)}KB, type: ${file.type}`);
+    }
 
     // Update the image form control to make it valid
     if (this.selectedFiles.length > 0) {
