@@ -1,4 +1,4 @@
-// vercel-proxy.js - Middleware for Vercel to proxy API requests
+// vercel-proxy.js - Middleware for Vercel to proxy API requests to Railway backend
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = (req, res) => {
