@@ -24,7 +24,6 @@ export class WishlistComponent implements OnInit {
   showNotifications = false;
   unreadNotificationCount = 0;
   userId = 0;
-  fallbackImageUrl = '/product-placeholder.jpg';
 
   // Track current image for each product
   productImageIndex: { [key: number]: number } = {};
@@ -76,7 +75,6 @@ export class WishlistComponent implements OnInit {
     this.isLoading = true;
     this.wishlistService.loadWishlist().subscribe(items => {
       this.wishlistItems = items;
-      console.log('Loaded wishlist items:', this.wishlistItems);
 
       // Initialize image indexes for all products
       this.wishlistItems.forEach(product => {
@@ -202,44 +200,5 @@ export class WishlistComponent implements OnInit {
 
     // Prevent event bubbling
     event.stopPropagation();
-  }
-
-  // Get the correct product image URL with proper path handling
-  getProductImageUrl(product: IProduct): string {
-    // First try to get image from the images array if available
-    if (product.images && product.images.length > 0) {
-      const currentIndex = this.productImageIndex[product.id] || 0;
-      const imageUrl = product.images[currentIndex].url;
-
-      // If the URL is already absolute, return it directly
-      if (imageUrl.startsWith('http')) {
-        return imageUrl;
-      }
-
-      // Otherwise, prepend the API base URL without the /api part
-      return `${environment.apiUrl.replace('/api', '')}/${imageUrl}`;
-    }
-
-    // Fallback to the main image if images array is not available
-    if (product.image) {
-      // If the image path is already an absolute URL, use it directly
-      if (product.image.startsWith('http')) {
-        return product.image;
-      }
-
-      // Otherwise, prepend the API base URL without the /api part
-      return `${environment.apiUrl.replace('/api', '')}/${product.image}`;
-    }
-
-    // If no image is available, return the fallback image
-    return this.fallbackImageUrl;
-  }
-
-  // Handle image loading errors
-  handleImageError(event: Event): void {
-    const imgElement = event.target as HTMLImageElement;
-    console.error('Image failed to load:', imgElement.src);
-    imgElement.src = this.fallbackImageUrl;
-    imgElement.onerror = null; // Prevent infinite loop if fallback also fails
   }
 }
