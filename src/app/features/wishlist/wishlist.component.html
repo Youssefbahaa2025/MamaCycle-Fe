@@ -130,16 +130,13 @@
              (mouseenter)="nextProductImage(item, $event)"
              (mouseleave)="resetProductImage(item, $event)">
           <img
-            [src]="getCurrentImage(item) || (
-              item.image.startsWith('http')
-                ? item.image
-                : (environment.apiUrl.replace('/api','') + '/' + item.image)
-            )"
+            [src]="getCurrentImage(item)"
             [alt]="item.name"
             class="product-image transition-transform duration-500"
+            onerror="this.src='/product-placeholder.jpg'; this.onerror='';"
           />
           <!-- Multi-image indicator -->
-          <div *ngIf="item.has_multiple_images || (item.images && item.images.length > 1)"
+          <div *ngIf="item.images && item.images.length > 1"
                class="absolute bottom-2 right-2 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-md">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600 dark:text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
@@ -160,6 +157,12 @@
               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </button>
+
+          <!-- Condition badge - only for rent products -->
+          <div *ngIf="item.condition && item.type === 'rent'"
+               class="absolute bottom-2 left-2 bg-indigo-600/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-lg shadow-lg">
+            {{ item.condition }}
+          </div>
         </div>
         <div class="product-info">
           <h3 class="product-title text-gray-800 dark:text-white">{{ item.name }}</h3>
@@ -176,7 +179,7 @@
           </p>
 
           <button (click)="addToCart(item.id, $event)"
-                  class="add-to-cart-btn bg-indigo-600 text-white py-3 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600">
+                  class="add-to-cart-btn hover-reveal bg-indigo-600 text-white py-3 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600">
             <span>Add to Cart</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />

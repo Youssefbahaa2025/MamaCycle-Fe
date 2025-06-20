@@ -73,36 +73,68 @@ export class WishlistComponent implements OnInit {
 
   loadWishlist(): void {
     this.isLoading = true;
-    this.wishlistService.loadWishlist().subscribe(items => {
-      this.wishlistItems = items;
+    this.wishlistService.loadWishlist().subscribe({
+      next: (items) => {
+        this.wishlistItems = items;
 
-      // Initialize image indexes for all products
-      this.wishlistItems.forEach(product => {
-        this.productImageIndex[product.id] = 0;
-      });
+        // Process image data for each product
+        this.wishlistItems.forEach(product => {
+          // Initialize image index for product
+          this.productImageIndex[product.id] = 0;
 
-      this.isLoading = false;
+          // Ensure images array is properly initialized
+          if (!product.images) {
+            product.images = [];
+          }
 
-      // Refresh AOS to detect new elements
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          AOS.refresh();
-        }
-      }, 100);
+          // If product has an image but no images array, add the main image to the images array
+          if (product.image && product.images.length === 0) {
+            product.images.push({
+              id: 0,
+              url: product.image,
+              is_primary: true
+            });
+          }
+        });
+
+        this.isLoading = false;
+
+        // Refresh AOS to detect new elements
+        setTimeout(() => {
+          if (typeof window !== 'undefined') {
+            AOS.refresh();
+          }
+        }, 100);
+      },
+      error: (err) => {
+        console.error('Error loading wishlist:', err);
+        this.isLoading = false;
+      }
     });
   }
 
   loadNotifications(): void {
-    this.wishlistService.getNotifications().subscribe(notifications => {
-      this.notifications = notifications;
-      this.updateUnreadCount();
+    this.wishlistService.getNotifications().subscribe({
+      next: (notifications) => {
+        this.notifications = notifications;
+        this.updateUnreadCount();
+      },
+      error: (err) => {
+        console.error('Error loading notifications:', err);
+      }
     });
   }
 
   removeFromWishlist(productId: number, event: Event): void {
     event.stopPropagation();
-    this.wishlistService.removeFromWishlist(productId).subscribe(() => {
-      // Item is already removed from the list by the service
+    this.wishlistService.removeFromWishlist(productId).subscribe({
+      next: () => {
+        // Remove item from local array
+        this.wishlistItems = this.wishlistItems.filter(item => item.id !== productId);
+      },
+      error: (err) => {
+        console.error('Error removing from wishlist:', err);
+      }
     });
   }
 
@@ -110,7 +142,15 @@ export class WishlistComponent implements OnInit {
     event.stopPropagation();
     this.cartService
       .addToCart({ userId: this.userId, productId, quantity: 1 })
-      .subscribe();
+      .subscribe({
+        next: () => {
+          console.log('Product added to cart');
+          this.cartService.refreshCartCount(this.userId);
+        },
+        error: (err) => {
+          console.error('Error adding product to cart', err);
+        }
+      });
   }
 
   goToProductDetails(productId: number): void {
@@ -186,10 +226,12 @@ export class WishlistComponent implements OnInit {
 
   // Get current image to display for a product
   getCurrentImage(product: IProduct): string {
-    if (!product.images || product.images.length === 0) return product.image;
+    if (!product.images || product.images.length === 0) {
+      return this.getImageUrl(product.image);
+    }
 
     const currentIndex = this.productImageIndex[product.id] || 0;
-    return product.images[currentIndex].url;
+    return this.getImageUrl(product.images[currentIndex].url);
   }
 
   // Reset image index when mouse leaves
@@ -200,5 +242,16 @@ export class WishlistComponent implements OnInit {
 
     // Prevent event bubbling
     event.stopPropagation();
+  }
+
+  // Helper method to get the correct image URL
+  getImageUrl(imagePath: string): string {
+    if (!imagePath) return '';
+
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    } else {
+      return `${environment.apiUrl.replace('/api', '')}/${imagePath}`;
+    }
   }
 }
