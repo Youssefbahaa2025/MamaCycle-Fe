@@ -8,11 +8,12 @@ import { IProduct } from '../../models/Iproduct';
 import { WishlistService, WishlistNotification } from '../../core/services/wishlist/wishlist.service';
 import { CartService } from '../../core/services/cart/cartservice.service';
 import { environment } from '../../../environments/environment';
+import { ImageUrlPipe } from '../../core/pipes/image-url.pipe';
 
 @Component({
   selector: 'app-wishlist',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ImageUrlPipe],
   templateUrl: './wishlist.component.html',
   styleUrls: ['./wishlist.component.css']
 })
@@ -75,7 +76,40 @@ export class WishlistComponent implements OnInit {
     this.isLoading = true;
     this.wishlistService.loadWishlist().subscribe({
       next: (items) => {
-        this.wishlistItems = items;
+        // Debug log the items
+        console.log('Wishlist items:', items);
+
+        // Check image URLs
+        if (items.length > 0) {
+          console.log('First item image URL:', items[0].image);
+          console.log('Images array:', items[0].images);
+        }
+
+        // Clean up and fix any malformed image URLs
+        const cleanedItems = items.map(item => {
+          // Fix malformed URLs that have the domain twice
+          if (item.image && item.image.includes('http') && item.image.indexOf('http', 8) > 0) {
+            const secondHttpIndex = item.image.indexOf('http', 8);
+            item.image = item.image.substring(secondHttpIndex);
+            console.log('Fixed malformed URL:', item.image);
+          }
+
+          // Do the same for image arrays
+          if (item.images && item.images.length > 0) {
+            item.images = item.images.map(img => {
+              if (img.url && img.url.includes('http') && img.url.indexOf('http', 8) > 0) {
+                const secondHttpIndex = img.url.indexOf('http', 8);
+                img.url = img.url.substring(secondHttpIndex);
+                console.log('Fixed malformed URL in images array:', img.url);
+              }
+              return img;
+            });
+          }
+
+          return item;
+        });
+
+        this.wishlistItems = cleanedItems;
 
         // Initialize image indexes for all products
         this.wishlistItems.forEach(product => {
@@ -101,7 +135,17 @@ export class WishlistComponent implements OnInit {
   loadNotifications(): void {
     this.wishlistService.getNotifications().subscribe({
       next: (notifications) => {
-        this.notifications = notifications;
+        // Fix any malformed image URLs in notifications
+        const cleanedNotifications = notifications.map(notification => {
+          if (notification.image && notification.image.includes('http') && notification.image.indexOf('http', 8) > 0) {
+            const secondHttpIndex = notification.image.indexOf('http', 8);
+            notification.image = notification.image.substring(secondHttpIndex);
+            console.log('Fixed malformed URL in notification:', notification.image);
+          }
+          return notification;
+        });
+
+        this.notifications = cleanedNotifications;
         this.updateUnreadCount();
       },
       error: (err) => {
@@ -211,10 +255,12 @@ export class WishlistComponent implements OnInit {
 
   // Get current image to display for a product
   getCurrentImage(product: IProduct): string {
-    if (!product.images || product.images.length === 0) return product.image;
+    if (!product.images || product.images.length === 0) {
+      return product.image;
+    }
 
     const currentIndex = this.productImageIndex[product.id] || 0;
-    return product.images[currentIndex].url;
+    return product.images[currentIndex].url || product.image;
   }
 
   // Reset image index when mouse leaves

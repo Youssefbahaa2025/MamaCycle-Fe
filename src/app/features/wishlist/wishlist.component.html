@@ -96,7 +96,7 @@
 
           <!-- Product Image -->
           <div class="ml-3 flex-shrink-0">
-            <img [src]="notification.image" [alt]="notification.product_name" class="w-12 h-12 object-cover rounded-md">
+            <img [src]="notification.image | imageUrl" [alt]="notification.product_name" class="w-12 h-12 object-cover rounded-md">
           </div>
         </div>
       </div>
@@ -130,13 +130,10 @@
              (mouseenter)="nextProductImage(item, $event)"
              (mouseleave)="resetProductImage(item, $event)">
           <img
-            [src]="getCurrentImage(item) || (
-              item.image.startsWith('http')
-                ? item.image
-                : (environment.apiUrl.replace('/api','') + '/' + item.image)
-            )"
+            [src]="getCurrentImage(item) | imageUrl"
             [alt]="item.name"
             class="product-image transition-transform duration-500"
+            onerror="this.src='/product-placeholder.jpg'; this.onerror='';"
           />
           <!-- Multi-image indicator -->
           <div *ngIf="item.has_multiple_images || (item.images && item.images.length > 1)"
