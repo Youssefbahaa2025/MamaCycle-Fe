@@ -129,15 +129,14 @@
         <div class="relative overflow-hidden"
              (mouseenter)="nextProductImage(item, $event)"
              (mouseleave)="resetProductImage(item, $event)">
-          <img
-            [src]="getCurrentImage(item) || (
-              item.image.startsWith('http')
-                ? item.image
-                : (environment.apiUrl.replace('/api','') + '/' + item.image)
-            )"
-            [alt]="item.name"
-            class="product-image transition-transform duration-500"
-          />
+          <div class="product-image-container">
+            <img
+              [src]="getProductImageUrl(item)"
+              [alt]="item.name"
+              class="product-image transition-transform duration-500"
+              (error)="handleImageError($event)"
+            />
+          </div>
           <!-- Multi-image indicator -->
           <div *ngIf="item.has_multiple_images || (item.images && item.images.length > 1)"
                class="absolute bottom-2 right-2 bg-white dark:bg-gray-800 rounded-full p-1.5 shadow-md">
