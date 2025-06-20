@@ -8,6 +8,7 @@ import { IProduct } from '../../models/Iproduct';
 import { WishlistService, WishlistNotification } from '../../core/services/wishlist/wishlist.service';
 import { CartService } from '../../core/services/cart/cartservice.service';
 import { environment } from '../../../environments/environment';
+import { ApiBaseService } from '../../core/services/api-base.service';
 
 @Component({
   selector: 'app-wishlist',
@@ -31,7 +32,8 @@ export class WishlistComponent implements OnInit {
   constructor(
     private wishlistService: WishlistService,
     private cartService: CartService,
-    private router: Router
+    private router: Router,
+    public apiBaseService: ApiBaseService
   ) { }
 
   ngOnInit(): void {
@@ -95,6 +97,12 @@ export class WishlistComponent implements OnInit {
               is_primary: true
             });
           }
+
+          // Log image data for debugging
+          console.log(`Product ${product.id} image data:`, {
+            mainImage: product.image,
+            images: product.images
+          });
         });
 
         this.isLoading = false;
@@ -246,12 +254,13 @@ export class WishlistComponent implements OnInit {
 
   // Helper method to get the correct image URL
   getImageUrl(imagePath: string): string {
-    if (!imagePath) return '';
+    if (!imagePath) return '/product-placeholder.jpg';
 
     if (imagePath.startsWith('http')) {
       return imagePath;
     } else {
-      return `${environment.apiUrl.replace('/api', '')}/${imagePath}`;
+      // Use assetUrl instead of apiUrl for image paths
+      return `${this.apiBaseService.assetUrl}/${imagePath}`;
     }
   }
 }
