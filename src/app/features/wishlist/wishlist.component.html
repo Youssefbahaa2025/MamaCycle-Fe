@@ -121,14 +121,6 @@
 
     <!-- Wishlist Grid -->
     <div *ngIf="wishlistItems.length > 0 && !isLoading" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <!-- Debug output for development -->
-      <div class="col-span-full mb-4 p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg text-sm" *ngIf="wishlistItems.length > 0">
-        <p class="font-medium">Debug Info (First Item):</p>
-        <p>Image path: {{ wishlistItems[0].image }}</p>
-        <p>Processed URL: {{ getCurrentImage(wishlistItems[0]) }}</p>
-        <p>Asset URL base: {{ apiBaseService.assetUrl }}</p>
-      </div>
-
       <div *ngFor="let item of wishlistItems; let i = index"
            class="product-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
            (click)="goToProductDetails(item.id)"

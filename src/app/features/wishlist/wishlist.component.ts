@@ -97,12 +97,6 @@ export class WishlistComponent implements OnInit {
               is_primary: true
             });
           }
-
-          // Log image data for debugging
-          console.log(`Product ${product.id} image data:`, {
-            mainImage: product.image,
-            images: product.images
-          });
         });
 
         this.isLoading = false;
@@ -256,11 +250,21 @@ export class WishlistComponent implements OnInit {
   getImageUrl(imagePath: string): string {
     if (!imagePath) return '/product-placeholder.jpg';
 
+    // Check if the URL has a double domain issue (contains the base URL twice)
+    if (imagePath.startsWith('http') && imagePath.includes(this.apiBaseService.assetUrl)) {
+      // Extract the actual Cloudinary URL part
+      const cloudinaryUrlMatch = imagePath.match(/https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/[^/]+\/[^/]+\.[a-zA-Z]+/);
+      if (cloudinaryUrlMatch) {
+        return cloudinaryUrlMatch[0];
+      }
+    }
+
+    // If it's already a full URL, return as is
     if (imagePath.startsWith('http')) {
       return imagePath;
-    } else {
-      // Use assetUrl instead of apiUrl for image paths
-      return `${this.apiBaseService.assetUrl}/${imagePath}`;
     }
+
+    // For relative paths, prepend the asset URL
+    return `${this.apiBaseService.assetUrl}/${imagePath}`;
   }
 }
