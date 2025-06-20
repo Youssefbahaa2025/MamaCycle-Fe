@@ -8,7 +8,6 @@ import { IProduct } from '../../models/Iproduct';
 import { WishlistService, WishlistNotification } from '../../core/services/wishlist/wishlist.service';
 import { CartService } from '../../core/services/cart/cartservice.service';
 import { environment } from '../../../environments/environment';
-import { ApiBaseService } from '../../core/services/api-base.service';
 
 @Component({
   selector: 'app-wishlist',
@@ -32,8 +31,7 @@ export class WishlistComponent implements OnInit {
   constructor(
     private wishlistService: WishlistService,
     private cartService: CartService,
-    private router: Router,
-    public apiBaseService: ApiBaseService
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -79,24 +77,9 @@ export class WishlistComponent implements OnInit {
       next: (items) => {
         this.wishlistItems = items;
 
-        // Process image data for each product
+        // Initialize image indexes for all products
         this.wishlistItems.forEach(product => {
-          // Initialize image index for product
           this.productImageIndex[product.id] = 0;
-
-          // Ensure images array is properly initialized
-          if (!product.images) {
-            product.images = [];
-          }
-
-          // If product has an image but no images array, add the main image to the images array
-          if (product.image && product.images.length === 0) {
-            product.images.push({
-              id: 0,
-              url: product.image,
-              is_primary: true
-            });
-          }
         });
 
         this.isLoading = false;
@@ -228,12 +211,10 @@ export class WishlistComponent implements OnInit {
 
   // Get current image to display for a product
   getCurrentImage(product: IProduct): string {
-    if (!product.images || product.images.length === 0) {
-      return this.getImageUrl(product.image);
-    }
+    if (!product.images || product.images.length === 0) return product.image;
 
     const currentIndex = this.productImageIndex[product.id] || 0;
-    return this.getImageUrl(product.images[currentIndex].url);
+    return product.images[currentIndex].url;
   }
 
   // Reset image index when mouse leaves
@@ -244,27 +225,5 @@ export class WishlistComponent implements OnInit {
 
     // Prevent event bubbling
     event.stopPropagation();
-  }
-
-  // Helper method to get the correct image URL
-  getImageUrl(imagePath: string): string {
-    if (!imagePath) return '/product-placeholder.jpg';
-
-    // Check if the URL has a double domain issue (contains the base URL twice)
-    if (imagePath.startsWith('http') && imagePath.includes(this.apiBaseService.assetUrl)) {
-      // Extract the actual Cloudinary URL part
-      const cloudinaryUrlMatch = imagePath.match(/https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/[^/]+\/[^/]+\.[a-zA-Z]+/);
-      if (cloudinaryUrlMatch) {
-        return cloudinaryUrlMatch[0];
-      }
-    }
-
-    // If it's already a full URL, return as is
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-
-    // For relative paths, prepend the asset URL
-    return `${this.apiBaseService.assetUrl}/${imagePath}`;
   }
 }
