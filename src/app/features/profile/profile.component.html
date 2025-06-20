@@ -139,7 +139,10 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">Total Listings</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ myItems.length }}</p>
+              <div *ngIf="isLoading" class="h-8 flex items-center">
+                <div class="loading-spinner-sm"></div>
+              </div>
+              <p *ngIf="!isLoading" class="text-2xl font-bold text-gray-900 dark:text-white">{{ myItems.length }}</p>
             </div>
             <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,7 +156,10 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">Total Orders</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ myOrders.length }}</p>
+              <div *ngIf="isLoading" class="h-8 flex items-center">
+                <div class="loading-spinner-sm"></div>
+              </div>
+              <p *ngIf="!isLoading" class="text-2xl font-bold text-gray-900 dark:text-white">{{ myOrders.length }}</p>
             </div>
             <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -167,7 +173,10 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-500 dark:text-gray-400">Account Created</p>
-              <p class="text-lg font-medium text-gray-900 dark:text-white">{{ user?.created_at | date:'mediumDate' }}</p>
+              <div *ngIf="isLoading" class="h-8 flex items-center">
+                <div class="loading-spinner-sm"></div>
+              </div>
+              <p *ngIf="!isLoading" class="text-lg font-medium text-gray-900 dark:text-white">{{ user?.created_at | date:'mediumDate' }}</p>
             </div>
             <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -273,10 +282,10 @@
                   [attr.data-aos]="'fade-up'"
                   [attr.data-aos-delay]="50 * i">
                 <td><span class="font-medium">{{ order.id }}</span></td>
-                <td>{{ order.date }}</td>
-                <td>{{ order.items }}</td>
+                <td>{{ order.created_at | date:'MMM d, y' }}</td>
+                <td>{{ order.items?.length || 0 }}</td>
                 <td>
-                  <span class="font-medium">EGP {{ order.total }}</span>
+                  <span class="font-medium">EGP {{ order.total_price }}</span>
                 </td>
                 <td>
                   <span class="status-badge" [ngClass]="getStatusClass(order.status)">{{ order.status }}</span>

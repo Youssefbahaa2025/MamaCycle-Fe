@@ -13,10 +13,19 @@ import * as AOS from 'aos';
 
 interface Order {
   id: number;
-  date: string;
+  created_at: string;
   status: string;
-  total: number;
-  items: number;
+  total_price: number;
+  address: string;
+  phone: string;
+  items: Array<{
+    id: number;
+    product_id: number;
+    quantity: number;
+    price: number;
+    product_name: string;
+    image?: string;
+  }>;
 }
 
 @Component({
@@ -82,9 +91,31 @@ export class ProfileComponent implements OnInit, AfterViewInit {
       observer.observe(document.documentElement, { attributes: true });
     }
 
-    this.loadUserData();
-    this.loadUserProducts();
-    this.loadUserOrders();
+    // Set initial loading state
+    this.isLoading = true;
+
+    // Initialize counters for tracking loaded resources
+    let loadedResources = 0;
+    const totalResources = 3; // user data, products, orders
+
+    const checkAllLoaded = () => {
+      loadedResources++;
+      if (loadedResources >= totalResources) {
+        this.isLoading = false;
+      }
+    };
+
+    // Load user profile data
+    this.loadUserData().then(() => checkAllLoaded())
+      .catch(() => checkAllLoaded());
+
+    // Load user products
+    this.loadUserProducts().then(() => checkAllLoaded())
+      .catch(() => checkAllLoaded());
+
+    // Load user orders
+    this.loadUserOrders().then(() => checkAllLoaded())
+      .catch(() => checkAllLoaded());
   }
 
   ngAfterViewInit(): void {
@@ -96,71 +127,97 @@ export class ProfileComponent implements OnInit, AfterViewInit {
     }, 100);
   }
 
-  loadUserData(): void {
-    this.isLoading = true;
-    this.userService.getProfile(this.userId).subscribe({
-      next: (resp: { user: any }) => {
-        this.user = resp.user;
-        this.form.patchValue({
-          name: this.user.name,
-          email: this.user.email
-        });
-
-        this.imagePreview = this.user.image
-          ? (this.user.image.startsWith('http')
-            ? this.user.image
-            : `${this.environment.apiUrl.replace('/api', '')}/${this.user.image}`)
-          : `${this.environment.apiUrl.replace('/api', '')}/uploads/profiles/default.jpg`;
-
-        this.isLoading = false;
-      },
-      error: (err: any) => {
-        console.error('Failed to load profile data', err);
-        alert('Failed to load profile data');
-        this.isLoading = false;
+  loadUserData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.userId) {
+        console.error('Cannot load user data: No user ID available');
+        reject(new Error('No user ID available'));
+        return;
       }
-    });
-  }
 
-  loadUserProducts(): void {
-    this.productService.getAll().subscribe({
-      next: (products: IProduct[]) => {
-        this.myItems = products.filter(p => p.seller_id === this.userId);
+      this.userService.getProfile(this.userId).subscribe({
+        next: (resp: { user: any }) => {
+          this.user = resp.user;
+          this.form.patchValue({
+            name: this.user.name,
+            email: this.user.email
+          });
 
-        // Refresh AOS to detect new elements
-        setTimeout(() => {
-          if (typeof window !== 'undefined') {
-            AOS.refresh();
+          this.imagePreview = this.user.image
+            ? (this.user.image.startsWith('http')
+              ? this.user.image
+              : `${this.environment.apiUrl.replace('/api', '')}/${this.user.image}`)
+            : `${this.environment.apiUrl.replace('/api', '')}/uploads/profiles/default.jpg`;
+
+          resolve();
+        },
+        error: (err: any) => {
+          console.error('Failed to load profile data', err);
+          if (err.status !== 404) {
+            alert('Failed to load profile data');
           }
-        }, 100);
-      },
-      error: (err: any) => console.error('Failed to load user products', err)
+          reject(err);
+        }
+      });
     });
   }
 
-  loadUserOrders(): void {
-    // In a real app, you would fetch real order data
-    // This creates mock data for demonstration purposes
-    setTimeout(() => {
-      this.myOrders = Array(4).fill(0).map((_, i) => ({
-        id: 10000 + i,
-        date: new Date(Date.now() - i * 86400000 * 3).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        }),
-        status: this.orderStatuses[Math.floor(Math.random() * this.orderStatuses.length)],
-        total: Math.floor(Math.random() * 1000) + 500,
-        items: Math.floor(Math.random() * 5) + 1
-      }));
+  loadUserProducts(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.productService.getAll().subscribe({
+        next: (products: IProduct[]) => {
+          this.myItems = products.filter(p => p.seller_id === this.userId);
 
-      // Refresh AOS
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          AOS.refresh();
+          // Refresh AOS to detect new elements
+          setTimeout(() => {
+            if (typeof window !== 'undefined') {
+              AOS.refresh();
+            }
+          }, 100);
+          resolve();
+        },
+        error: (err: any) => {
+          console.error('Failed to load user products', err);
+          this.myItems = []; // Ensure empty array on error
+          reject(err);
         }
-      }, 100);
-    }, 500);
+      });
+    });
+  }
+
+  loadUserOrders(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.userId) {
+        console.error('Cannot load orders: No user ID available');
+        this.myOrders = []; // Ensure empty array
+        resolve();
+        return;
+      }
+
+      this.orderService.getUserOrders(this.userId).subscribe({
+        next: (orders: Order[]) => {
+          this.myOrders = orders;
+
+          // Refresh AOS to detect new elements
+          setTimeout(() => {
+            if (typeof window !== 'undefined') {
+              AOS.refresh();
+            }
+          }, 100);
+          resolve();
+        },
+        error: (err: any) => {
+          console.error('Failed to load user orders', err);
+          this.myOrders = []; // Ensure empty array on error
+
+          // Don't show alert for 404 (no orders yet)
+          if (err.status !== 404) {
+            // Silent error - handled by the loading state
+          }
+          reject(err);
+        }
+      });
+    });
   }
 
   onImageChange(event: Event): void {
@@ -276,13 +333,18 @@ export class ProfileComponent implements OnInit, AfterViewInit {
   }
 
   getStatusClass(status: string): string {
+    if (!status) return '';
+
     switch (status.toLowerCase()) {
       case 'delivered':
+      case 'completed':
         return 'approved';
       case 'processing':
       case 'shipped':
+      case 'pending':
         return 'pending';
       case 'cancelled':
+      case 'canceled':
         return 'rejected';
       default:
         return '';
